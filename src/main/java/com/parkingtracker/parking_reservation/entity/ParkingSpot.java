@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "parking_spot", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_spot_code", columnNames = "code") // preco prave to co je v zatvorke
+        @UniqueConstraint(name = "uk_spot_code", columnNames = "code")
 })
 @Data
 @NoArgsConstructor
@@ -24,10 +24,10 @@ public class ParkingSpot {
 
     @NotBlank
     @Column(nullable = false, length = 50, unique = true)
-    private String code;  // napr. A1, B2
+    private String code;  // example A1, B2
 
     @Column(nullable = false)
-    private boolean active = true;  // defaultne je miesto aktívne
+    private boolean active = true;
 }
 
 
