@@ -1,8 +1,11 @@
 package com.parkingtracker.parking_reservation.controller;
 
 
+import com.parkingtracker.parking_reservation.DTO.ReservationRequestDTO;
+import com.parkingtracker.parking_reservation.DTO.ReservationResponseDTO;
 import com.parkingtracker.parking_reservation.entity.Reservation;
 import com.parkingtracker.parking_reservation.service.ReservationService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,17 +20,17 @@ public class ReservationController {
 
 
     @PostMapping
-    public Reservation create(@RequestBody Reservation reservation){
-        return service.create(reservation);
+    public ReservationResponseDTO create(@Valid @RequestBody ReservationRequestDTO req){
+        return service.create(req);
     }
 
     @GetMapping
-    public List<Reservation> findAll() {
+    public List<ReservationResponseDTO> findAll() {
         return service.findAll();
     }
 
     @GetMapping("/{id}")
-    public Reservation findById(@PathVariable Long id){
+    public ReservationResponseDTO findById(@PathVariable Long id){
         return service.findById(id);
     }
 

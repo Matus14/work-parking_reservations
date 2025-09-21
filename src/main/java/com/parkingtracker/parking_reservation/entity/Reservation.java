@@ -24,7 +24,7 @@ public class Reservation {
 
     @NotBlank
     @Column(nullable = false, length = 50)
-    private String customerName;
+    private String name;
 
     @Column(nullable = false)
     private LocalDateTime startTime;
