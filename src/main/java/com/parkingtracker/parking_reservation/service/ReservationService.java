@@ -26,7 +26,7 @@ public class ReservationService {
 
     public ReservationResponseDTO create(ReservationRequestDTO req){
         if(req.getStartTime().isAfter(req.getEndTime()) || req.getStartTime().isEqual(req.getEndTime())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start time cant be after end time");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "StartTime must be before the endTime");
         }
 
         ParkingSpot spot = spotRepository.findById(req.getSpotId())
