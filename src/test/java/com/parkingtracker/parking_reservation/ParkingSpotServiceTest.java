@@ -149,7 +149,7 @@ public class ParkingSpotServiceTest {
         assertThat(result.get(0).getCode()).isEqualTo("A1");
         assertThat(result.get(0).getId()).isEqualTo(1L);
         assertThat(result.get(0).isActive()).isTrue();
-        assertThat(result.get(1).getCode()).isEqualTo("A1");
+        assertThat(result.get(1).getCode()).isEqualTo("B2");
         assertThat(result.get(1).getId()).isEqualTo(2L);
         assertThat(result.get(1).isActive()).isFalse();
 

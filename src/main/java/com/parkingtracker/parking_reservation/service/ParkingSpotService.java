@@ -19,15 +19,15 @@ public class ParkingSpotService {
     private ParkingSpotRepository repository;
 
     public ParkingSpotResponseDTO createSpot(ParkingSpotRequestDTO request){
-       if(request.getCode() == null || request.getCode().isEmpty()){
+       if(request.getCode() == null || request.getCode().trim().isEmpty()){
            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can not be null or empty");
        }
-       if(repository.existsByCode(request.getCode())){
+       if(repository.existsByCode(request.getCode().trim())){
            throw new ResponseStatusException(HttpStatus.CONFLICT, "Parking spot code already exists");
        }
 
        ParkingSpot entity = ParkingSpot.builder()
-               .code(request.getCode())
+               .code(request.getCode().trim())
                .active(request.isActive())
                .build();
 
