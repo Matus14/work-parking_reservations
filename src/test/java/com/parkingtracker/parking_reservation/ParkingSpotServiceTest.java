@@ -35,8 +35,7 @@ public class ParkingSpotServiceTest {
     @Captor
     private ArgumentCaptor<ParkingSpot> spotCaptor;
 
-
-                                   // ====== CREATE =====
+    // ====== CREATE =====
 
     @Test
     void create_checkOfTheDataAvailabilityForSave() {
@@ -134,7 +133,7 @@ public class ParkingSpotServiceTest {
     }
 
 
-                                 //====== SHOW ALL ======
+    //====== SHOW ALL ======
     @Test
     void showAll_returnsListOfDto() {
 
@@ -170,7 +169,7 @@ public class ParkingSpotServiceTest {
     }
 
 
-                              //====== SHOW BY ID ======
+    //====== SHOW BY ID ======
 
     @Test
     void showById_returnsDtoWhenExists() {
@@ -201,7 +200,7 @@ public class ParkingSpotServiceTest {
     }
 
 
-                                   //====== DELETE ======
+    //====== DELETE ======
 
 
     @Test
