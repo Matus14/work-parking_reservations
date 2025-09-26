@@ -75,6 +75,7 @@ public class ReservationServiceTest {
 
         verify(repository).save(any(Reservation.class));
         verify(spotRepository).findById(1L);
+        verifyNoMoreInteractions(repository, spotRepository);
 
     }
 
@@ -95,6 +96,7 @@ public class ReservationServiceTest {
 
         verify(spotRepository).findById(99L);
         verify(repository, never()).save(any(Reservation.class));
+        verifyNoMoreInteractions(repository, spotRepository);
     }
 
     @Test
@@ -111,8 +113,71 @@ public class ReservationServiceTest {
                 .hasMessageContaining("StartTime must be before the endTime");
 
         verifyNoInteractions(spotRepository, repository);
-
     }
+
+    @Test
+    void create_throwBadRequestWhenStartIsSameAsEnd(){
+
+        ReservationRequestDTO request = new ReservationRequestDTO();
+        request.setName("Matus");
+        request.setStartTime(LocalDateTime.of(2025, 1, 1, 10, 0));
+        request.setEndTime(LocalDateTime.of(2025, 1, 1, 10, 0));
+        request.setSpotId(9L);
+
+        assertThatThrownBy(()-> service.create(request))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("StartTime must be before the endTime");
+
+        verifyNoInteractions(spotRepository, repository);
+    }
+
+
+    @Test
+    void create_takesValuesFromRequestAndSendsProperEntityToRepository(){
+
+        ReservationRequestDTO request = new ReservationRequestDTO();
+        request.setName("Matus");
+        request.setStartTime(LocalDateTime.of(2025, 1, 1, 10, 0));
+        request.setEndTime(LocalDateTime.of(2025, 1, 1, 12, 0));
+        request.setSpotId(9L);
+
+        ParkingSpot spot = ParkingSpot.builder()
+                .code("A1")
+                .active(true)
+                .id(9L)
+                .build();
+
+        when(spotRepository.findById(9L)).thenReturn(Optional.of(spot));
+        when(repository.save(any(Reservation.class)))
+                .thenAnswer(inv -> {
+                    Reservation r = inv.getArgument(0);
+                    r.setId(4L);
+                    return r;
+                });
+
+        ReservationResponseDTO dto = service.create(request);
+        verify(repository).save(reservationCaptor.capture());
+        Reservation saved = reservationCaptor.getValue();
+        assertThat(saved.getName()).isEqualTo("Matus");
+        assertThat(saved.getStartTime()).isEqualTo(request.getStartTime());
+        assertThat(saved.getEndTime()).isEqualTo(request.getEndTime());
+        assertThat(saved.getSpot().getId()).isEqualTo(9L);
+        assertThat(saved.getSpot().getCode()).isEqualTo("A1");
+        assertThat(saved.getSpot()).isNotNull();
+
+        assertThat(dto.getId()).isEqualTo(4L);
+        assertThat(dto.getName()).isEqualTo("Matus");
+        assertThat(dto.getStartTime()).isEqualTo(request.getStartTime());
+        assertThat(dto.getEndTime()).isEqualTo(request.getEndTime());
+        assertThat(dto.getSpotCode()).isEqualTo("A1");
+        assertThat(dto.getSpotId()).isEqualTo(9L);
+
+        verify(spotRepository).findById(9L);
+        verify(repository).save(any(Reservation.class));
+        verifyNoMoreInteractions(repository, spotRepository);
+    }
+
+
 
                                 // ======== FIND ALL  ========
 
@@ -213,7 +278,7 @@ public class ReservationServiceTest {
 
         service.delete(9L);
 
-        verify(repository.existsById(9L));
+        verify(repository).existsById(9L);
         verify(repository).deleteById(9L);
     }
 
