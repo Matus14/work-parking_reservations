@@ -35,10 +35,10 @@ public class ParkingSpotServiceTest {
     @Captor
     private ArgumentCaptor<ParkingSpot> spotCaptor;
 
-    // ====== CREATE =====
+                                     // ====== CREATE =====
 
     @Test
-    void create_checkOfTheDataAvailabilityForSave() {
+    void create_whenNewParkingSpotIsCreated_thenItIsSavedAsDto() {
 
         ParkingSpotRequestDTO request = new ParkingSpotRequestDTO();
         request.setCode("A1");
@@ -62,7 +62,7 @@ public class ParkingSpotServiceTest {
     }
 
     @Test
-    void create_checkIfThereIsDuplicityInCreateSpot() {
+    void create_whenCreatingParkingSpotWithDuplicate_thrownExceptionAndNoSave() {
 
         ParkingSpotRequestDTO request = new ParkingSpotRequestDTO();
         request.setCode("A1");
@@ -78,7 +78,7 @@ public class ParkingSpotServiceTest {
     }
 
     @Test
-    void create_checkIfParkingSpotCodeIsEmpty() {
+    void create_whenCreatingSpotWithEmptyCode_thenExceptionIsThrownAndNoSave() {
 
         ParkingSpotRequestDTO request = new ParkingSpotRequestDTO();
         request.setCode("  ");
@@ -92,7 +92,7 @@ public class ParkingSpotServiceTest {
     }
 
     @Test
-    void create_checkIfParkingSpotCodeIsNull() {
+    void create_whenCreatingSpotWithNullCode_thenExceptionIsThrownAndNoSave() {
 
         ParkingSpotRequestDTO request = new ParkingSpotRequestDTO();
         request.setCode(null);
@@ -102,10 +102,12 @@ public class ParkingSpotServiceTest {
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("Can not be null or empty");
 
+        verify(repository, never()).save(any(ParkingSpot.class));
+
     }
 
     @Test
-    void create_takesValuesFromRequestAndSendsProperEntityToRepository() {
+    void create_whenCreatingSpotFromRequest_thenSavesMatchingEntityAndReturnsDtoWithId() {
 
         ParkingSpotRequestDTO request = new ParkingSpotRequestDTO();
         request.setCode("B2");
@@ -121,8 +123,11 @@ public class ParkingSpotServiceTest {
 
         ParkingSpotResponseDTO dto = service.createSpot(request);
 
+        verify(repository).existsByCode("B2");
         verify(repository).save(spotCaptor.capture());
         ParkingSpot saved = spotCaptor.getValue();
+
+        assertThat(saved.getId()).isNull();
         assertThat(saved.getCode()).isEqualTo("B2");
         assertThat(saved.isActive()).isFalse();
 
@@ -130,12 +135,14 @@ public class ParkingSpotServiceTest {
         assertThat(dto.getId()).isEqualTo(3L);
         assertThat(dto.isActive()).isFalse();
 
+        verifyNoMoreInteractions(repository);
+
     }
 
 
-    //====== SHOW ALL ======
+                                //====== SHOW ALL ======
     @Test
-    void showAll_returnsListOfDto() {
+    void showAll_whenFindingAllSpots_thenRepositoryResultsAreMappedToDto() {
 
         ParkingSpot s1 = ParkingSpot.builder().code("A1").id(1L).active(true).build();
         ParkingSpot s2 = ParkingSpot.builder().code("B2").id(2L).active(false).build();
@@ -157,7 +164,7 @@ public class ParkingSpotServiceTest {
     }
 
     @Test
-    void showAll_returnEmptyListWhenNoDataAvailable() {
+    void showAll_whenNoParkingSpotsExist_thenReturnsEmptyDtoList() {
 
         when(repository.findAll()).thenReturn(List.of());
 
@@ -169,10 +176,10 @@ public class ParkingSpotServiceTest {
     }
 
 
-    //====== SHOW BY ID ======
+                                     //====== SHOW BY ID ======
 
     @Test
-    void showById_returnsDtoWhenExists() {
+    void showById_whenFindingSpotById_thenReturnsDtoIfExists() {
 
         ParkingSpot s = ParkingSpot.builder().id(4L).code("12F").active(true).build();
         when(repository.findById(4L)).thenReturn(Optional.of(s));
@@ -188,7 +195,7 @@ public class ParkingSpotServiceTest {
     }
 
     @Test
-    void showById_throwsNotFoundMessage (){
+    void showById_whenFindingSpotByInvalidId_thenExceptionIsThrown(){
 
         when(repository.findById(5L)).thenReturn(Optional.empty());
 
@@ -200,11 +207,11 @@ public class ParkingSpotServiceTest {
     }
 
 
-    //====== DELETE ======
+                                             //====== DELETE ======
 
 
     @Test
-    void delete_removeSpotIfExists() {
+    void delete_whenDeletingExistingSpot_thenSpotIsRemoved() {
 
         when(repository.existsById(82L)).thenReturn(true);
 
@@ -215,7 +222,7 @@ public class ParkingSpotServiceTest {
     }
 
     @Test
-    void delete_throwsNotFoundMessage() {
+    void delete_whenDeletingNonExistingSpot_thenExceptionIsThrownAndDeleteNotCalled() {
 
         when(repository.existsById(3L)).thenReturn(false);
 

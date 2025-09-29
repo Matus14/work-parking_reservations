@@ -42,7 +42,7 @@ public class ReservationServiceTest {
 
                                 // ====== CREATE =======
     @Test
-    void create_findOutDataAreStoredCorrectly() {
+    void create_whenCreatingReservation_thenSavesAndReturnsDtoWithLinkedSpot() {
 
         ReservationRequestDTO request = new ReservationRequestDTO();
         request.setName("Matus");
@@ -80,7 +80,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    void create_throwNotFoundMessageWhenSpotMissing() {
+    void create_whenCreatingReservationWithNonexistentSpot_thenThrowsNotFoundAndNoSave() {
 
         ReservationRequestDTO request = new ReservationRequestDTO();
         request.setName("Matus");
@@ -100,7 +100,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    void create_throwBadRequestWhenStartIsAfterEnd(){
+    void create_whenCreatingReservationWithInvalidTimeRange_thenThrowsBadRequest(){
 
         ReservationRequestDTO request = new ReservationRequestDTO();
         request.setName("Matus");
@@ -116,7 +116,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    void create_throwBadRequestWhenStartIsSameAsEnd(){
+    void create_whenCreatingReservationWithSameStartAndEnd_thenThrowsBadRequest(){
 
         ReservationRequestDTO request = new ReservationRequestDTO();
         request.setName("Matus");
@@ -133,7 +133,7 @@ public class ReservationServiceTest {
 
 
     @Test
-    void create_takesValuesFromRequestAndSendsProperEntityToRepository(){
+    void create_whenCreatingReservation_thenCorrectEntityIsSavedAndMatchingDtoIsReturned(){
 
         ReservationRequestDTO request = new ReservationRequestDTO();
         request.setName("Matus");
@@ -182,7 +182,7 @@ public class ReservationServiceTest {
                                 // ======== FIND ALL  ========
 
     @Test
-    void showAll_checkIfDataAreStoredInList() {
+    void showAll_whenFindingAllReservations_thenEntitiesAreMappedToDto() {
 
         Reservation r1 = Reservation.builder()
                 .name("Ivan")
@@ -219,7 +219,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    void showAll_returnEmptyListWhenNoDataAvailable() {
+    void showAll_whenFindingAllReservationsWithEmptyRepo_thenReturnsEmptyList() {
 
         when(repository.findAll()).thenReturn(List.of());
 
@@ -233,7 +233,7 @@ public class ReservationServiceTest {
 
 
     @Test
-    void findById_returnsDtoWhenExists() {
+    void findById_whenFindingReservationById_thenReturnsDtoIfExists() {
 
         Reservation r = Reservation.builder()
                 .name("Ivan")
@@ -255,7 +255,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    void findById_throwNotFound() {
+    void findById_whenFindingReservationByInvalidId_thenExceptionIsThrown() {
 
         when(repository.findById(9L)).thenReturn(Optional.empty());
 
@@ -272,7 +272,7 @@ public class ReservationServiceTest {
 
 
     @Test
-    void delete_removeReservationIfExists(){
+    void delete_whenDeletingExistingReservation_thenItIsRemoved(){
 
         when(repository.existsById(9L)).thenReturn(true);
 
@@ -283,7 +283,7 @@ public class ReservationServiceTest {
     }
 
     @Test
-    void delete_throwNoFoundMessage() {
+    void delete_whenDeletingNonExistingReservation_thenExceptionIsThrownAndDeleteNotCalled() {
 
         when(repository.existsById(2L)).thenReturn(false);
 
